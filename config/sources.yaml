@@ -1,0 +1,51 @@
+# Journal and source configurations for Phase 2
+
+sage_journals:
+  asr:
+    name: "American Sociological Review"
+    rss: "https://journals.sagepub.com/feed/asr"
+  ajs:
+    name: "American Journal of Sociology"
+    rss: "https://journals.sagepub.com/feed/ajs"
+  gso:
+    name: "Gender & Society"
+    rss: "https://journals.sagepub.com/feed/gso"
+  smr:
+    name: "Sociological Methods & Research"
+    rss: "https://journals.sagepub.com/feed/smr"
+  chn:
+    name: "Chinese Journal of Sociology"
+    rss: "https://journals.sagepub.com/feed/chn"
+
+nature_journals:
+  nature:
+    name: "Nature"
+    rss: "https://www.nature.com/nature.rss"
+  nature_human_behaviour:
+    name: "Nature Human Behaviour"
+    rss: "https://www.nature.com/nathumbehav/rss/current"
+
+other_journals:
+  pnas:
+    name: "PNAS"
+    rss: "https://www.pnas.org/rss/current.xml"
+  science:
+    name: "Science"
+    rss: "https://www.science.org/rss/news_current.xml"
+  social_forces:
+    name: "Social Forces"
+    rss: "https://academic.oup.com/rss/site_sf/current.xml"
+  demography:
+    name: "Demography"
+    rss: "https://link.springer.com/search.rss?facet-journal-id=13524"
+
+crossref_journals:
+  rssm:
+    name: "Research on Social Stratification and Mobility"
+    issn: "0276-5624"
+  chinese_soc_review:
+    name: "Chinese Sociological Review"
+    issn: "2162-0555"
+  social_science_research:
+    name: "Social Science Research"
+    issn: "0049-089X"

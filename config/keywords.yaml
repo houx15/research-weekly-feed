@@ -1,0 +1,40 @@
+# Keywords for filtering research papers
+# Papers will be scored based on how many keyword categories they match
+
+arxiv:
+  categories:
+    - cs.CY  # Computers and Society
+    - cs.SI  # Social and Information Networks
+    - stat.AP  # Statistics - Applications
+    - econ.GN  # Economics - General Economics
+
+keywords:
+  primary:
+    - computational methods
+    - gender inequality
+    - social media
+    - feminist
+    - social networks
+    - demographic
+    - machine learning social science
+
+  secondary:
+    - feminism
+    - gender gap
+    - gender bias
+    - women in tech
+    - online communities
+    - social computing
+    - computational social science
+    - digital sociology
+    - social media analysis
+    - network analysis
+    - algorithmic bias
+    - platform studies
+
+search:
+  # Default number of days to look back
+  default_days: 7
+
+  # Maximum results to fetch per category
+  max_results: 100
