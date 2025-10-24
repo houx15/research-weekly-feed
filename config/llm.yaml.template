@@ -1,0 +1,37 @@
+# LLM configuration for paper scoring
+# Copy this file to llm.yaml and fill in your credentials
+
+# Choose provider: "dashscope" (Aliyun) or "azure" (Azure OpenAI)
+provider: "dashscope"
+
+# Aliyun DashScope configuration
+dashscope:
+  api_key: "YOUR_DASHSCOPE_API_KEY"
+  model: "qwen-plus"  # or "qwen-turbo", "qwen-max"
+
+# Azure OpenAI configuration (alternative to DashScope)
+azure_openai:
+  endpoint: "YOUR_AZURE_ENDPOINT"  # e.g., https://your-resource.openai.azure.com/
+  api_key: "YOUR_API_KEY"
+  deployment: "gpt-4o-mini"  # Your deployment name
+
+# Research interests for LLM to evaluate papers against
+research_interests: |
+  The researcher is interested in:
+  1. Gender inequality and feminist perspectives, particularly in academic, workplace, and social contexts
+  2. Computational methods and quantitative approaches in social science research
+  3. Social media analysis, including studies of online communities, platforms, and digital sociology
+  4. Intersection of technology and society, especially algorithmic bias and platform studies
+  5. Demographic analysis and social stratification
+  6. Machine learning applications in social science research
+  7. Social networks and network analysis
+
+# LLM scoring settings
+scoring:
+  min_score: 50  # Minimum score (0-100) to include paper
+  cache_enabled: true
+  cache_dir: ".cache/llm_decisions"
+
+  # Score thresholds for grouping
+  high_threshold: 75
+  medium_threshold: 50

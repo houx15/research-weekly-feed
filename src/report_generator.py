@@ -53,7 +53,18 @@ class MarkdownReportGenerator:
         md += f"**Authors:** {self._format_authors(paper.authors)}\n\n"
         md += f"**Published:** {pub_date}\n\n"
         md += f"**Relevance Score:** {paper.relevance_score}\n\n"
-        md += f"**Matched Keywords:** {keywords_str}\n\n"
+
+        # Show LLM metadata if available
+        if hasattr(paper, 'llm_metadata') and paper.llm_metadata:
+            md += f"**LLM Confidence:** {paper.llm_metadata.get('confidence', 'N/A')}\n\n"
+            if paper.llm_metadata.get('reasoning'):
+                md += f"**LLM Reasoning:** {paper.llm_metadata['reasoning']}\n\n"
+            if paper.llm_metadata.get('topics'):
+                topics_str = ", ".join(paper.llm_metadata['topics'])
+                md += f"**Relevant Topics:** {topics_str}\n\n"
+        else:
+            md += f"**Matched Keywords:** {keywords_str}\n\n"
+
         if hasattr(paper, 'doi') and paper.doi:
             md += f"**DOI:** {paper.doi}\n\n"
         md += f"**Link:** {paper.url}\n\n"

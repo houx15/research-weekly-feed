@@ -12,6 +12,7 @@ from src.fetchers.base_fetcher import Paper
 from src.fetchers.crossref_fetcher import CrossRefFetcher
 from src.fetchers.rss_fetcher import RSSFetcher
 from src.filter import PaperFilter
+from src.llm_scorer import LLMPaperScorer
 from src.report_generator import MarkdownReportGenerator
 
 
@@ -67,15 +68,43 @@ def main():
         type=str,
         help="Specific journal code to fetch (e.g., 'asr', 'nature', 'pnas')",
     )
+    parser.add_argument(
+        "--use-llm",
+        action="store_true",
+        help="Use LLM (GPT-4o-mini) for semantic relevance scoring instead of keyword matching",
+    )
+    parser.add_argument(
+        "--llm-config",
+        type=str,
+        default="config/llm.yaml",
+        help="Path to LLM configuration file",
+    )
 
     args = parser.parse_args()
 
     # Load configuration
     try:
-        config = Config(args.config, args.sources_config)
+        config = Config(args.config, args.sources_config, args.llm_config)
     except FileNotFoundError as e:
         print(f"Error: {e}")
         sys.exit(1)
+
+    # Check LLM configuration if using LLM
+    if args.use_llm:
+        provider = config.llm_provider
+        if provider == "dashscope":
+            if not config.dashscope_api_key:
+                print("Error: LLM mode requires DashScope API key in config/llm.yaml")
+                print("Copy config/llm.yaml.template to config/llm.yaml and fill in your credentials")
+                sys.exit(1)
+        elif provider == "azure":
+            if not config.azure_endpoint or not config.azure_api_key:
+                print("Error: LLM mode requires Azure OpenAI configuration in config/llm.yaml")
+                print("Copy config/llm.yaml.template to config/llm.yaml and fill in your credentials")
+                sys.exit(1)
+        else:
+            print(f"Error: Unknown LLM provider '{provider}'. Use 'dashscope' or 'azure'")
+            sys.exit(1)
 
     # Use default days from config if not specified
     days = args.days if args.days is not None else config.default_days
@@ -159,25 +188,59 @@ def main():
         sys.exit(0)
 
     # Step 2: Filter and score papers
-    print("\n[Filtering papers by keywords...]")
-    paper_filter = PaperFilter(
-        primary_keywords=config.primary_keywords,
-        secondary_keywords=config.secondary_keywords,
-    )
+    if args.use_llm:
+        provider = config.llm_provider
+        if provider == "dashscope":
+            print(f"\n[Scoring papers with LLM ({config.dashscope_model} via DashScope)...]")
+            llm_scorer = LLMPaperScorer(
+                api_key=config.dashscope_api_key,
+                model=config.dashscope_model,
+                research_interests=config.research_interests,
+                provider="dashscope",
+            )
+        else:  # azure
+            print(f"\n[Scoring papers with LLM ({config.azure_deployment} via Azure)...]")
+            llm_scorer = LLMPaperScorer(
+                api_key=config.azure_api_key,
+                model=f"{config.azure_endpoint}|{config.azure_deployment}",
+                research_interests=config.research_interests,
+                provider="azure",
+            )
 
-    filtered_papers = paper_filter.filter_papers(all_papers, min_score=args.min_score)
-    print(f"✓ Found {len(filtered_papers)} relevant papers")
+        min_score = args.min_score if args.min_score > 1 else config.llm_min_score
+        filtered_papers = llm_scorer.score_papers_batch(all_papers, min_score=min_score)
+        print(f"✓ Found {len(filtered_papers)} relevant papers")
 
-    if not filtered_papers:
-        print("\nNo papers matched the keyword criteria.")
-        sys.exit(0)
+        if not filtered_papers:
+            print("\nNo papers matched the LLM relevance criteria.")
+            sys.exit(0)
 
-    # Step 3: Group papers by relevance
-    print("\n[Grouping papers by relevance...]")
-    grouped_papers = paper_filter.group_papers_by_relevance(filtered_papers)
-    print(f"✓ High relevance: {len(grouped_papers['high'])} papers")
-    print(f"✓ Medium relevance: {len(grouped_papers['medium'])} papers")
-    print(f"✓ Low relevance: {len(grouped_papers['low'])} papers")
+        # Step 3: Group papers by LLM relevance
+        print("\n[Grouping papers by LLM relevance...]")
+        grouped_papers = llm_scorer.group_papers_by_relevance(filtered_papers)
+        print(f"✓ High relevance (≥75): {len(grouped_papers['high'])} papers")
+        print(f"✓ Medium relevance (50-74): {len(grouped_papers['medium'])} papers")
+        print(f"✓ Low relevance (<50): {len(grouped_papers['low'])} papers")
+    else:
+        print("\n[Filtering papers by keywords...]")
+        paper_filter = PaperFilter(
+            primary_keywords=config.primary_keywords,
+            secondary_keywords=config.secondary_keywords,
+        )
+
+        filtered_papers = paper_filter.filter_papers(all_papers, min_score=args.min_score)
+        print(f"✓ Found {len(filtered_papers)} relevant papers")
+
+        if not filtered_papers:
+            print("\nNo papers matched the keyword criteria.")
+            sys.exit(0)
+
+        # Step 3: Group papers by relevance
+        print("\n[Grouping papers by relevance...]")
+        grouped_papers = paper_filter.group_papers_by_relevance(filtered_papers)
+        print(f"✓ High relevance: {len(grouped_papers['high'])} papers")
+        print(f"✓ Medium relevance: {len(grouped_papers['medium'])} papers")
+        print(f"✓ Low relevance: {len(grouped_papers['low'])} papers")
 
     # Step 4: Generate report
     print("\n[Generating markdown report...]")

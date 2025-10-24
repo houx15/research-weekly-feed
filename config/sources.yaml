@@ -3,19 +3,16 @@
 sage_journals:
   asr:
     name: "American Sociological Review"
-    rss: "https://journals.sagepub.com/feed/asr"
-  ajs:
-    name: "American Journal of Sociology"
-    rss: "https://journals.sagepub.com/feed/ajs"
-  gso:
+    rss: "https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=asr&type=etoc&feed=rss"
+  gas:
     name: "Gender & Society"
-    rss: "https://journals.sagepub.com/feed/gso"
+    rss: "https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=gas&type=etoc&feed=rss"
   smr:
     name: "Sociological Methods & Research"
-    rss: "https://journals.sagepub.com/feed/smr"
+    rss: "https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=smr&type=etoc&feed=rss"
   chn:
     name: "Chinese Journal of Sociology"
-    rss: "https://journals.sagepub.com/feed/chn"
+    rss: "https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=chn&type=etoc&feed=rss"
 
 nature_journals:
   nature:
